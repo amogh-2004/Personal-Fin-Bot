@@ -1,5 +1,3 @@
-
-
 import streamlit as st
 import os
 import random
@@ -439,4 +437,5 @@ def main():
     st.markdown("💡 *This chatbot provides general financial education. Always consult a professional advisor for personalized financial planning.*")
 
 if __name__ == "__main__":
+
     main()
