@@ -4,14 +4,14 @@ import random
 import re
 from dotenv import load_dotenv
 
-# Load environment variables
+
 load_dotenv()
 
 class FinanceChatbot:
     def __init__(self):
         self.api_key = os.getenv("HF_API_KEY")
         
-        # Comprehensive financial knowledge base
+        
         self.knowledge_base = {
             "savings": {
                 "student": [
@@ -135,7 +135,6 @@ class FinanceChatbot:
             }
         }
         
-        # Common financial questions and responses
         self.quick_responses = {
             "credit score": "Your credit score affects loan rates and approval. Pay bills on time, keep credit utilization below 30%, don't close old accounts, and check your credit report annually for errors.",
             
@@ -158,15 +157,12 @@ class FinanceChatbot:
         user_goals = user_profile.get("goals", [])
         user_income = user_profile.get("income", 0)
         
-        # Check for quick responses first
         for keyword, response in self.quick_responses.items():
             if keyword in message_lower:
                 return self.personalize_response(response, user_profile)
         
-        # Classify the main intent
         intent = self.classify_intent(message_lower)
         
-        # Get appropriate advice based on intent and user profile
         if intent == "savings":
             advice = self.get_savings_advice(user_type, user_profile)
         elif intent == "budgeting":
@@ -206,8 +202,7 @@ class FinanceChatbot:
             base_advice = random.choice(self.knowledge_base["savings"][user_type])
         else:
             base_advice = random.choice(self.knowledge_base["savings"]["student"])
-        
-        # Add income-specific advice if available
+
         income = user_profile.get("income", 0)
         if income > 0:
             if income < 3000:
@@ -225,8 +220,7 @@ class FinanceChatbot:
             advice = random.choice(self.knowledge_base["budgeting"][user_type])
         else:
             advice = random.choice(self.knowledge_base["budgeting"]["student"])
-        
-        # Add goal-specific advice
+
         goals = user_profile.get("goals", [])
         if "Budget Better" in goals:
             advice += "\n\n🎯 Since budgeting is one of your goals, try the 50/30/20 rule as a starting point, then adjust based on your specific needs."
@@ -239,8 +233,7 @@ class FinanceChatbot:
             advice = random.choice(self.knowledge_base["investing"][user_type])
         else:
             advice = random.choice(self.knowledge_base["investing"]["student"])
-        
-        # Add age-specific guidance
+
         if age < 30:
             advice += "\n\n📈 At your age, you can afford to take more risk for potentially higher returns. Consider 80-90% stocks, 10-20% bonds."
         elif age < 50:
@@ -289,8 +282,7 @@ class FinanceChatbot:
         """Add personalization based on user profile"""
         user_type = user_profile.get("type", "")
         goals = user_profile.get("goals", [])
-        
-        # Add greeting based on user type
+
         if user_type == "student":
             prefix = "As a student, "
         elif user_type == "working professional":
@@ -303,8 +295,7 @@ class FinanceChatbot:
             prefix = "In retirement, "
         else:
             prefix = ""
-        
-        # Add goal-specific encouragement
+
         goal_encouragement = ""
         if goals:
             if len(goals) == 1:
@@ -321,8 +312,7 @@ def main():
         page_icon="💰",
         layout="centered"
     )
-    
-    # Initialize session state
+
     if 'messages' not in st.session_state:
         st.session_state.messages = [
             {"role": "assistant", "content": "Hello! I'm your personal finance assistant. I can help you with savings, budgeting, investing, taxes, and general financial advice. What would you like to know?"}
@@ -335,37 +325,30 @@ def main():
             "age": 20,
             "goals": []
         }
-    
-    # Initialize chatbot
+
     if 'chatbot' not in st.session_state:
         st.session_state.chatbot = FinanceChatbot()
-    
-    # Header
+
     st.title("💰 Personal Finance Chatbot")
     st.markdown("Your AI-powered financial advisor for personalized guidance")
-    
-    # Sidebar for user profile
+
     with st.sidebar:
         st.header("👤 Your Profile")
-        
-        # User type
+
         user_type = st.selectbox(
             "I am a:",
             ["Student", "Working Professional", "Recent Graduate", "Entrepreneur", "Retiree"]
         )
-        
-        # Age
+
         age = st.slider("Age", 18, 80, 25)
-        
-        # Income (optional)
+
         income = st.number_input(
             "Monthly Income ($)", 
             min_value=0, 
             value=0,
             help="Optional - helps provide more personalized advice"
         )
-        
-        # Financial goals
+
         st.subheader("🎯 Financial Goals")
         goals = st.multiselect(
             "Select your goals:",
@@ -380,16 +363,14 @@ def main():
                 "Tax Planning"
             ]
         )
-        
-        # Update profile
+
         st.session_state.user_profile = {
             "type": user_type.lower(),
             "income": income,
             "age": age,
             "goals": goals
         }
-        
-        # Quick tips
+
         st.markdown("---")
         st.markdown("💡 **Quick Tips:**")
         if user_type == "Student":
@@ -400,23 +381,19 @@ def main():
             st.markdown("• Maximize 401(k) matching")
             st.markdown("• Build 6-month emergency fund")
             st.markdown("• Consider tax-advantaged accounts")
-    
-    # Main chat interface
+
     st.markdown("---")
-    
-    # Display chat messages
+
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
-    
-    # Chat input
+
     if prompt := st.chat_input("Ask me anything about personal finance..."):
-        # Add user message
+
         st.session_state.messages.append({"role": "user", "content": prompt})
         with st.chat_message("user"):
             st.markdown(prompt)
-        
-        # Generate and display response
+
         with st.chat_message("assistant"):
             with st.spinner("Thinking..."):
                 try:
@@ -431,11 +408,11 @@ def main():
                     st.markdown(error_message)
                     st.session_state.messages.append({"role": "assistant", "content": error_message})
                     st.error(f"Debug info: {str(e)}")
-    
-    # Footer
+
     st.markdown("---")
     st.markdown("💡 *This chatbot provides general financial education. Always consult a professional advisor for personalized financial planning.*")
 
 if __name__ == "__main__":
 
     main()
+
